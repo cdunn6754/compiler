@@ -9,7 +9,9 @@ enum class TokenType {
 
   // Misc.
   SEMICOLON, RIGHT_BRACKET, LEFT_BRACKET, RIGHT_PAREN,
-  LEFT_PAREN, IDENTIFIER, NUMBER
+  LEFT_PAREN, IDENTIFIER, NUMBER,
+
+  EOF, UNKNOWN
 };
 
 
@@ -35,7 +37,19 @@ class Token {
 // };
 
 class Lexer {
+  static std::vector<std::string> regex_strings = {
+    std::string(";"),
+    std::string("return"),
+    std::string("}"),
+    std::string("\\{"),
+    std::string("\\("),
+    std::string("\\)"),
+    std::string("int"),
+    std::string("[a-zA-Z]\\w*"),
+    std::string("[0-9]+"),
+  };
+
   public:
 
-    std::vector<Token> tokenize(std::string program);
+    std::vector<Token> tokenize(const std::string& program);
 };

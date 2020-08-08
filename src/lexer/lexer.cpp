@@ -12,18 +12,32 @@ std::string Token::get_value() {
   return value;
 }
 
-std::vector<Token> Lexer::tokenize(std::string program) {
-  // std::vector<std::string> regex_strings = {
-  //   std::string(";"),
-  //   std::string("return"),
-  //   std::string("}"),
-  //   std::string("\\{"),
-  //   std::string("\\("),
-  //   std::string("\\)"),
-  //   std::string("int"),
-  //   std::string("[a-zA-Z]\\w*"),
-  //   std::string("[0-9]+"),
-  // };
+std::vector<Token> Lexer::tokenize(const std::string& program) {
+
+  if (program.empty()) {
+    return {};
+  }
+
+  std::vector<Token> tokens;
+
+  auto program_it = program.begin()
+  auto program_end = program.end()
+
+  while (true) {
+
+    while(program_end != program_it && std::isspace(*program_it)) {
+      program_it++;
+    }
+    if (program_it == program_end) {
+      toks.push_back(Token(TokenType::EOF))
+      break;
+    }
+
+    for (const auto& r : regex_strings) {
+
+    }
+
+  }
 
   // std::vector<std::string> tokens;
 
