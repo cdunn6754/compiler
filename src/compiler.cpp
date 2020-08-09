@@ -10,5 +10,8 @@ int main() {
   Lexer lexer;
   std::vector<Token> tokens = lexer.tokenize(code);
 
+  for (auto token : tokens)
+    std::cout << " Token Value: " << token.get_value() << std::endl;
+
   return 0;
 }

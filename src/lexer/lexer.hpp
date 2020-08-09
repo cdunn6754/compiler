@@ -1,9 +1,11 @@
 #include <string>
 #include <vector>
 #include <regex>
+#include <utility>
 
 
 enum class TokenType {
+
   // Keywords
   RETURN, INT,
 
@@ -11,7 +13,7 @@ enum class TokenType {
   SEMICOLON, RIGHT_BRACKET, LEFT_BRACKET, RIGHT_PAREN,
   LEFT_PAREN, IDENTIFIER, NUMBER,
 
-  EOF, UNKNOWN
+  TOK_EOF, UNKNOWN,
 };
 
 
@@ -20,34 +22,19 @@ class Token {
   std::string value;
 
   public:
-    Token(TokenType s, std::string value);
+    Token(TokenType type, std::string value);
     TokenType get_type();
     std::string get_value();
 };
 
 
-// template <class T>
-// class ValueToken: Token {
-//   T value;
-
-//   public:
-//     ValueToken(TokenType s, T value);
-
-
-// };
-
 class Lexer {
-  static std::vector<std::string> regex_strings = {
-    std::string(";"),
-    std::string("return"),
-    std::string("}"),
-    std::string("\\{"),
-    std::string("\\("),
-    std::string("\\)"),
-    std::string("int"),
-    std::string("[a-zA-Z]\\w*"),
-    std::string("[0-9]+"),
-  };
+  static std::vector<std::pair<TokenType, std::string>> regex_strings;
+
+  Token get_next_token(
+    std::string::const_iterator program_it,
+    std::string::const_iterator program_end
+  );
 
   public:
 

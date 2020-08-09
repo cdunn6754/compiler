@@ -1,9 +1,10 @@
 #include "lexer.hpp"
 
 Token::Token(TokenType type, std::string value) {
-  type = type;
-  value = value;
+  this->type = type;
+  this->value = value;
 }
+
 TokenType Token::get_type() {
   return type;
 }
@@ -11,6 +12,18 @@ TokenType Token::get_type() {
 std::string Token::get_value() {
   return value;
 }
+
+std::vector<std::pair<TokenType, std::string>> Lexer::regex_strings = {
+  std::make_pair(TokenType::SEMICOLON, std::string(";")),
+  std::make_pair(TokenType::RETURN, std::string("return")),
+  std::make_pair(TokenType::RIGHT_BRACKET, std::string("}")),
+  std::make_pair(TokenType::LEFT_BRACKET, std::string("\\{")),
+  std::make_pair(TokenType::RIGHT_PAREN, std::string("\\(")),
+  std::make_pair(TokenType::LEFT_PAREN, std::string("\\)")),
+  std::make_pair(TokenType::INT, std::string("int")),
+  std::make_pair(TokenType::IDENTIFIER, std::string("[a-zA-Z]\\w*")),
+  std::make_pair(TokenType::NUMBER, std::string("[0-9]+")),
+};
 
 std::vector<Token> Lexer::tokenize(const std::string& program) {
 
@@ -20,64 +33,47 @@ std::vector<Token> Lexer::tokenize(const std::string& program) {
 
   std::vector<Token> tokens;
 
-  auto program_it = program.begin()
-  auto program_end = program.end()
+  std::string::const_iterator program_it = program.begin();
+  std::string::const_iterator program_end = program.end();
 
   while (true) {
-
     while(program_end != program_it && std::isspace(*program_it)) {
       program_it++;
     }
     if (program_it == program_end) {
-      toks.push_back(Token(TokenType::EOF))
+      tokens.push_back(Token(TokenType::TOK_EOF, "eof"));
       break;
     }
 
-    for (const auto& r : regex_strings) {
-
+    Token next_tok = get_next_token(program_it, program_end);
+    if (next_tok.get_type() == TokenType::UNKNOWN) {
+      program_it += 1;
+    } else {
+      program_it += next_tok.get_value().length();
     }
-
+    tokens.push_back(next_tok);
   }
 
-  // std::vector<std::string> tokens;
-
-  // std::unordered_map<int, std::smatch> r_map;
-
-  // int current_idx = 0;
-
-  // std::smatch m;
-
-  // code = strip_leading_whitespace(code);
-  // while (code.length()) {
-  //   for (const auto& s : regex_strings) {
-  //     std::cout << s << std::endl;
-  //     std::smatch m_tmp;
-  //     auto found = std::regex_search(code, m_tmp, std::regex(s));
-  //     std::cout << "found: " << found << " idx: " << m_tmp.position() << std::endl;
-  //     if (found && m_tmp.position() == 0) {
-  //       break
-  //     }
-  //   }
-
-  //   std::cout << "current idx: " << current_idx << std::endl;
-  //   if (r_map.count(current_idx) == 0) {
-  //     std::cout << "Invalid input at index: " << current_idx << std::endl;
-  //     return 0;
-  //   }
-
-  //   m = r_map[current_idx];
-  //   std::cout << "current match: " << m.str() << std::endl;
-  //   tokens.push_back(m.str());
-  //   current_idx += m.length();
-  // }
-
-  // std::cout << "tokens: ";
-  // for (auto token:tokens) std::cout << token << ", ";
-  // std::cout << std::endl;
-
-  return std::vector<Token>();
+  return tokens;
 }
 
+Token Lexer::get_next_token(
+  std::string::const_iterator program_it,
+  std::string::const_iterator program_end) {
+
+  auto tmp_it = program_it;
+  std::smatch m;
+  for (const auto& regex_pair : this->regex_strings) {
+    std::string regex_string = regex_pair.second;
+    tmp_it = program_it;
+    bool found = std::regex_search(tmp_it, program_end, m, std::regex(regex_string));
+    if (found && m.position() == 0) {
+      Token tok = Token(regex_pair.first, m.str());
+      return tok;
+    }
+  }
+  return Token(TokenType::UNKNOWN, "unknown");
+}
 
 std::string strip_leading_whitespace(const std::string& s) {
   std::smatch m;
